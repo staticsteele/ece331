@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+$x=4;
+$y="55";
+&y++;
+print $y;
+$z="AB";
+$z++;
+print "$z\n";
+print 4*$y+z;
+
+@list = ("jessie", "connor", "sean");
+foreach (@list) {
+	print $_; print increment
+	s/sean/shawn/; substitute
+	print; print $_
+	$e=~s/([A-Z)]/Lc($e)/eg;
+	print $list[2]
+	$list[406] = "boom";
+	$x[0]=960
+	$x[2]=20}

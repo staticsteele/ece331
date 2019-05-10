@@ -1,0 +1,8 @@
+#!/usr/bin/python
+import os
+
+print os.environ
+print os.environ['USER']
+for k in os.environ.keys():
+	print k, os.environ[k]
+

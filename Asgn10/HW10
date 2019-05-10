@@ -1,0 +1,80 @@
+1) This homework was written in Vim.
+
+
+2) This cron jobs runs at the 45th minute of noon and midnight of every first 
+   day of the month and every Monday (1st day) and Friday (5th day).
+
+
+3) scp -P 666 simulation wizard@summit.ornl.gov: destination
+
+
+4) # man thd
+
+thd is the triggerhappy daemon. It watches all input devices for key/button 
+presses that could launch commands specified by sys admin. It is similar to 
+hotkeys but better for hardware switches.
+
+
+5) 
+
+    a) Given: IP = 68.34.29.55 NM = /18
+        NA = IP & NM (looking at last 16 bits) = 00011101.00110111 & 11000000.000000
+           = 0.0 --> NA = 68.34.0.0
+
+        BC = IP | ~NM (looking at last 16 bits) = 00011101.00110111 | 00111111.11111111
+           = 00111111.11111111 --> BA = 68.34.63.255 
+
+    b) Given: NA = 24.32.0.0  BC = 24.63.255.255
+        IP = An IP in the given range between the NA and BC is  24.40.150.100 
+		NM = Because the last 21 bits vary between NA and BC, NM = 32-21 = /11.
+
+
+6)  
+	a) No.
+    
+	b) The code won't work because the lock is initialized every time the write 
+	function is called. It creates a lock, then immediately checks if it is locked. 
+	For every call made to write, there is a race condition to initialize the 
+	mutex lock. This causes concurrency issues. It will then be difficult to tell 
+	what state the lock is in if it's constantly being initialized. 
+
+    c) The initialize code for the lock (both the definition and the initialization)
+	shoudl be moved outside of the function and declared as a global variable. 
+	A single global mutex struct can then be checked by the code, and will behave 
+	appropriately. the lock can be part of the struct with data to be passed between 
+	all functions.  
+
+
+7) Host Elessar routing table
+
+Destination         Gateway         Genmask            Flags  Metric Ref  Use Iface
+1.2.0.0             0.0.0.0         255.255.128.0      U      1      0    0   ETH1
+10.0.0.0            0.0.0.0         255.254.0.0        U      1      0    0   ETH0
+141.141.3.0         0.0.0.0         255.255.255.192    U      1      0    0   ETH2
+0.0.0.0             1.2.3.101       0.0.0.0            UG     0      0    0   ETH1
+
+
+8) Legolas to Gandalf ethernet frame
+
+MAC Destination    MAC Source         IP Source    IP Destination
+-----------------------------------------------------------------
+66:00:00:00:00:00  00:00:00:00:00:22  141.114.3.3  1.2.3.101
+FF:00:00:00:00:00  00:00:00:00:00:77  141.114.3.3  1.2.3.101
+
+
+
+
+
+
+
+9)
+	a) CREATE TABLE data(Date TEXT, Time TEXT, Latitude REAL, Longitude REAL, 
+		Altitude INTEGER, Location TEXT);
+
+	b) INSERT INTO data(Date, Time, Latitude, Longitude, Altitude, Location)
+			VALUES('04-25-2019','08:01:45',44.90234,-68.667147, 117, 'TI Lab');
+	
+	c) SELECT * FROM data WHERE "Altitude" > 5000;
+   
+
+10) This homework was printed with 'enscript'.

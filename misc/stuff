@@ -1,0 +1,81 @@
+
+CREATE TABLE table_name(
+   	column1 datatype,
+    column2 datatype,
+	column3 datatype,
+		    .....
+	columnN datatype,
+	PRIMARY KEY( one or more columns  )
+				  
+		);
+
+Types:
+
+REAL 
+INTEGER 
+TEXT
+NULL
+BLOB - stored as it was inputted.
+
+ALTER TABLE table_name ADD COLUMN column_def...;
+
+ALTER TABLE table_name RENAME TO new_table_name;
+
+INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)
+VALUES (1, 'Paul', 32, 'California', 20000.00 );
+
+A router table (also called routing table) is stored data used by TCP/IP network routers to calculate the destinations of messages they are responsible for forwarding. A router table is a small in-memory database managed by the router's built-in hardware and software.
+
+Router Table Entries and Sizes
+Router tables contain a list of IP addresses. Each address in the list identifies a remote router (or another network gateway) that the local router is configured to recognize. For each IP address, the router table additionally stores a network mask and other data that specifies the destination IP address ranges that remote device will accept.
+
+Home network routers utilize a very small router table because they simply forward all outbound traffic to the Internet Service Provider (ISP) gateway which takes care of all other routing steps. Home router tables typically contain ten or fewer entries. By comparison, the largest routers at the core of the internet backbone must maintain the full Internet routing table that contains several hundred thousand entries. (See the CIDR Report for latest Internet routing statistics.)
+
+Dynamic vs. Static Routing
+Home routers set up their routing tables automatically when connected to the Internet provider, a process called dynamic routing. They generate one router table entry for each of the service provider's DNS servers (primary, secondary, and tertiary, if available) and one entry for routing among all the home computers. They may also generate a few additional routes for other special cases including multicast and broadcast routes.
+
+Some residential network routers prevent you from manually overriding or changing the router table. However, business routers allow network administrators to manually update or manipulate routing tables. This so-called static routing can be useful when optimizing for network performance and reliability. On a home network, the use of static routers are not required except in unusual circumstances (such as when setting up multiple subnetworks and a second router).
+
+Viewing the Contents of Routing Tables
+On home broadband routers, routing table contents are typically shown on a screen inside the administrative console. An example IPv4 table is shown below.
+
+Destination     LAN IP	        Subnet Mask	    Gateway	Interface
+0.0.0.0	        0.0.0.0	        xx.yyy.86.1	    WAN (Internet)
+xx.yyy.86.1	    255.255.255.255	xx.yyy.86.1	    WAN (Internet)
+xx.yyy.86.134	255.255.255.255	xx.yy.86.134	WAN (Internet)
+192.168.1.0	    255.255.255.0	192.168.1.101	LAN & Wireless
+Routing Table Entry List (Example)
+In this example, the first two entries represent routes to the Internet provider's gateway address ('xx' and 'yyy' represent real IP address values that are hidden for the purpose of this article). The third entry represents the route to the home router's public facing IP address assigned by the provider. The last entry represents the route for all computers within the home network to the home router, where the router has IP address 192.168.1.101.
+
+On Windows and Unix/Linux computers, the netstat -r command also displays the contents of the router table configured on the local computer.
+
+Differences in Data Transfer Features
+TCP ensures a reliable and ordered delivery of a stream of bytes from user to server or vice versa. UDP is not dedicated to end to end connections and communication does not check readiness of receiver.
+
+Reliability
+TCP is more reliable since it manages message acknowledgment and retransmissions in case of lost parts. Thus there is absolutely no missing data. UDP does not ensure that communication has reached receiver since concepts of acknowledgment, time out and retransmission are not present.
+
+Ordering
+TCP transmissions are sent in a sequence and they are received in the same sequence. In the event of data segments arriving in wrong order, TCP reorders and delivers application. In the case of UDP, sent message sequence may not be maintained when it reaches receiving application. There is absolutely no way of predicting the order in which message will be received.
+
+Connection
+TCP is a heavy weight connection requiring three packets for a socket connection and handles congestion control and reliability. UDP is a lightweight transport layer designed atop an IP. There are no tracking connections or ordering of messages.
+
+Method of transfer
+TCP reads data as a byte stream and message is transmitted to segment boundaries. UDP messages are packets which are sent individually and on arrival are checked for their integrity. Packets have defined boundaries while data stream has none.
+
+Error Detection
+UDP works on a "best-effort" basis. The protocol supports error detection via checksum but when an error is detected, the packet is discarded. Retransmission of the packet for recovery from that error is not attempted. This is because UDP is usually for time-sensitive applications like gaming or voice transmission. Recovery from the error would be pointless because by the time the retransmitted packet is received, it won't be of any use.
+
+TCP uses both error detection and error recovery. Errors are detected via checksum and if a packet is erroneous, it is not acknowledged by the receiver, which triggers a retransmission by the sender. This operating mechanism is called Positive Acknowledgement with Retransmission (PAR).
+
+How TCP and UDP work
+A TCP connection is established via a three way handshake, which is a process of initiating and acknowledging a connection. Once the connection is established data transfer can begin. After transmission, the connection is terminated by closing of all established virtual circuits.
+
+@yearly (or @annually) - Run the specified task once a year at midnight (12:00am) of 1st of January. Equivalent to 0 0 1 1 *.
+@monthly - Run the specified task once a month at midnight on the first day of the month. Equivalent to 0 0 1 * *.
+@weekly - Run the specified task nconcee a week at midnight on Sunday. Equivalent to 0 0 * * 0.
+@daily - Run the specified task once a day at midnight. Equivalent to 0 0 * * *.
+@hourly - Run the specified task once an hour at the beginning of the hour. Equivalent to 0 * * * *.
+@reboot - Run the specified task at the system startup (boot-time).
+

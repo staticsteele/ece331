@@ -1,0 +1,56 @@
+1) This homework was written in vim.
+
+2)  #sqlite3 boarddata.db
+	#CREATE TABLE data (TEMP1 REAL, IR INTEGER, FULL INTEGER, VIS INTEGER,
+	LUX INTEGER, TEMP2 INTEGER, PRESSURE INTEGER, HUMID INTEGER, 
+	dt datetime default current_timestamp);
+
+3) 
+
+#!/usr/bin/perl
+
+# Steele Muchemore-Allen ECE 331 
+# Perl script that grabs data from serial port
+# and imports it into an sqlite database table
+
+use Device::SerialPort;
+use DBI;
+use strict;
+
+#Opens the serial device for communication
+my $port = new Device::SerialPort("/dev/ttyACM0")
+	or die "Can't open /dev/ttyACM0: $!\n";
+
+#Sends a character to recieve data from device
+$port->write('a');
+
+#Looks for device being sent by device
+my $data = $port->lookfor();
+
+#Removes newlines and parses data 
+chomp($data);
+my @list = split(/[ |]+/, $data);
+
+#Removes data for clear run next time 
+$port->lookclear;
+
+#opens the database for manipulation
+my $driver = "SQLite";
+my $database = "boarddata.db";
+my $dsn = "DBI:$driver:dbname=$database";
+my $userid = "";
+my $password = "";
+my $dbh = DBI->connect($dsn, $userid, $password, { RaiseError => 1  }) 
+   or die $DBI::errstr;
+
+#Sends parsed data to the pre-created table, with the current time included
+my $stmt = qq(INSERT INTO data (TEMP1,IR,FULL,VIS,LUX,TEMP2,PRESSURE,HUMID, dt)
+			VALUES ($list[0], $list[1], $list[2], $list[3], $list[4], $list[5],
+			$list[6], $list[7], CURRENT_TIMESTAMP));
+my $rv = $dbh->do($stmt) or die $DBI::errstr;
+
+#Releases the database and serial port 
+$dbh->disconnect();
+$port->close or warn "close failed";
+
+4) This homework was printed with 'enscript'.

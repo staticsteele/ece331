@@ -1,0 +1,106 @@
+
+1. This homework was written in vim. 
+
+2.
+   # sudo apt-get update
+   # cd /usr/src
+   # sudo git clone https://github.com/raspberrypi/linux.git
+   # sudo mv linux linux`uname -r`
+   # make mrproper
+   # sudo modprobe configs
+   # sudo cp/proc/config.gz /usr/src/linux4.9.59-v7+
+   # sudo gzip -dv config.gz
+   # cd /boot
+   # sudo wget https://github.com/raspberrypi/firmware/blob/master/
+   extra/Module7.symvers
+   # sudo ln -s /boot/Module7.symvers /usr/src/linux4.9.59-v7+/Module.symvers
+   # sudo make modules_prepare
+   # cd /lib/modules/4.9.59-v7+
+   # sudo ln -s /usr/src/linux4.9.59-v7+ build
+   # sudo ln build source
+
+3.
+
+/*
+ *Program creates child process and prints out child pid.
+ */
+#include <stdio.h> 
+#include <unistd.h>
+ 
+int main(void)
+{
+        pid_t pid;
+        
+        //Return value is 0 for child process
+        if (fork() == 0) {
+                printf("I am the child.\n");
+                pid = getpid();
+                printf("Child pid is %d\n",pid);
+        }
+        else
+                printf("I am the parent\n");
+
+        return 0;
+}
+
+
+4. 
+   # sudo useradd test
+   # sudo passwd test 
+   # sudo groupadd ece331
+   # sudo usermod -aG dialout,i2c,ece331,gpio,spi test
+
+
+5. See included diagrams. 
+
+
+6. # mkdir -p a/b/c/d/e/f/g
+
+
+7.
+
+/*
+ *Program opens file from command line argument and reads
+ *through it for '\n' to count total lines in file.
+ */
+
+#include <stdio.h>
+ 
+int main(int argc, char *argv[])
+{
+        FILE *fp;
+        int count = 0; 
+        char c;
+
+        if (argc == 1) {
+                printf("No filename.\n");
+                return -1;
+        } else if (argc > 2) {
+                printf("Too many arguements.\n");
+                return -1;
+        }
+
+        //Opens file for reading with "r'"
+        fp = fopen(argv[argc-1], "r");
+
+        //If our file pointer points to nothing when opened
+        if (fp == NULL) {
+                printf("Could not open file %s\n", argv[argc-1]);
+                return -1;
+        }
+        
+        //As long as we dont hit EOF, keep checking char by char for '\n'
+        while (!feof(fp)) {
+
+                c = fgetc(fp);
+                if (c == '\n')
+                        count++;
+        }
+
+        fclose(fp);
+        printf("The file %s has %d lines.\n", argv[argc-1], count);
+        return 0;
+}
+
+
+8. This homework was printed with 'enscript'.

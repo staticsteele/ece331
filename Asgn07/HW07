@@ -1,0 +1,48 @@
+90   
+1. This homework was written in vim.
+
+2.
+   a) Given: IP = 10.34.178.39 NM = 255.255.224.0
+        NA = IP & NM = 1010.00100010.10110010.100111 & 11111111.11111111.11100000.0
+           = 1010.100010.10100000.0 = 10.34.160.0
+        BC = IP | ~NM = 1010.00100010.10110010.100111 | 0.0.00011111.11111111
+           = 1010.00100010.10111111.11111111 = 10.34.191.255 
+
+   b) Given: NA = 192.168.89.201 BC = 192.168.89.207
+        IP = We only know the range the IP can be within, which is: 
+           = 192.168.89.202 to 192.168.89.206. 
+        NM = Because the last 3 bits vary between NA and BC, the NM is /29.
+
+3.
+   a) 
+        Followed both https://pymotw.com/2/socket/tcp.html and 
+        https://realpython.com/python-sockets/ for TCP server and client tutorial. 
+   
+   b) 
+        The tutorial for TCP server and client in python was completed.
+
+   c) 
+      socket()  -  Creates a new socket. 
+      bind()    -  Binds socket to a given address. 
+      listen()  -  Listens for connections made to the socket. 
+      accept()  -  Accepts a connection. Allows for sending and receiving data, 
+                   and specifies address bound to socket on other end of connection. 
+      connect() -  Connects to a socket at given address.
+4. 
+   a) 
+        The python script lets you know how many 1's the provided netmask has.
+
+   b)
+        The script works by first taking a netmask from the command line. If the netmask
+   has more than 4 parts separated by '.' then an error message is printed. 255.255.255.0 
+   and 255.255.255 would pass while 255.255.0.0.0 wouldn't. Each of the 4 parts are then 
+   converted to binary and put in the same string. The "0b" from binary conversion is 
+   removed. If there are more than one transition from a 1 to a 0 then an error message 
+   is printed because this wouldn't be a valid netmask. 1111111100000000 would pass while 
+   1111011100000000 wouldn't. Lastly, the netmask is printed in the shorthand method 
+   specifying the number of 1's. This is done by splitting the string at every 1 and 
+   removing the part with 0's. 255.225.0.0 would get split into [255, 255, 0, 0]. It would 
+   then turn into 0b111111110b111111110b00b0 and then into 111111111111111100. Lastly, it 
+   is split as [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,00] and would be printed as "/16".   
+
+5. This homework was printed with 'enscript'.

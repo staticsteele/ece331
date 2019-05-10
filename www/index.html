@@ -1,0 +1,660 @@
+<html>
+<head>
+<title>Steele's Website</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<META http-equiv="refresh" content="300">
+<script type="text/javascript" src="moment-with-locales.js"></script>
+<script type="text/javascript" src="Chart.min.js"></script>
+<script type="text/javascript" src="jquery.min.js"></script>
+
+</head>
+<body bgcolor= #FFFFFF>
+<h1><u>Steele's Home Webpage</u></h1>
+<p>Below are plots of various sensor data being gathered from an expansion board for the Raspberry Pi. The data is collected every minute from the board. Data over the 24 hours prior to page access is displayed.</p>
+
+<u>Steps Taken:</u>
+<ol>
+	<li>Web server set up on Pi using NGINX.</li>
+	<li>Perl script written to extract data from expansion board (serial device).</li>
+	<li>SQLite3 database created to hold the data from perl script.</li>
+	<li>Cron job made to run perl script every minute.</li>
+	<li>PHP script written to take records from database and encode to JSON.</li>
+	<li>HTML file used with JavaScript to JSON data from PHP script.</li>
+</ol>
+<p>Access date and time: <span id="datetime"></span></p>
+
+<button   
+    onclick="togglePageElementVisibility('temp1')">  
+        Show/Hide Temperature Plot 
+</button>  
+<button   
+    onclick="togglePageElementVisibility('ir')">  
+        Show/Hide Light Intensity Plot 
+</button>  
+<button   
+    onclick="togglePageElementVisibility('lux')">  
+        Show/Hide Illuminance Plot 
+</button>  
+<button   
+    onclick="togglePageElementVisibility('pressure')">  
+        Show/Hide Pressure Plot 
+</button>  
+<button   
+    onclick="togglePageElementVisibility('humid')">  
+        Show/Hide Humidity Plot 
+</button>
+
+<style>
+#temp1 {
+	background-color: #FAFAFA;
+	padding: 1em;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 2em;
+	margin-bottom: 2em;
+	display:none;
+}
+#ir {
+	background-color: #FAFAFA;
+	padding: 1em;
+    margin-left: auto;
+	margin-right: auto;
+    margin-top: 2em;
+	margin-bottom: 2em;
+	display:none;
+}
+#lux {
+	background-color: #FAFAFA;
+	padding: 1em;
+    margin-top: 2em;
+	margin-bottom: 2em;
+	margin-left: auto;
+	margin-right: auto;
+    display:none;
+}
+#pressure {
+	background-color: #FAFAFA;
+	padding: 1em;
+    margin-top: 2em;
+	margin-bottom: 2em;
+	margin-left: auto;
+	margin-right: auto;
+    display:none;
+}
+#humid {
+	background-color: #FAFAFA;
+	padding: 1em;
+    margin-top: 2em;
+	margin-bottom: 2em;
+	margin-left: auto;
+	margin-right: auto;
+    display:none;
+}
+</style>
+
+<canvas id="temp1" width="1200px" height="700px" style="border:10px solid #303030;"></canvas>
+<canvas id="ir" width="1200px" height="700px" style="border:10px solid #303030;"></canvas>
+<canvas id="lux" width="1200px" height="700px" style="border:10px solid #303030;"></canvas>
+<canvas id="pressure" width="1200px" height="700px" style="border:10px solid #303030;"></canvas>
+<canvas id="humid" width="1200px" height="700px" style="border:10px solid #303030;"></canvas>
+
+<script>
+function plot(results) {
+
+// Vars to hold t,y data sets
+var temp1 = [];
+var ir = [];
+var full = [];
+var vis = [];
+var lux = [];
+var temp2 = [];
+var pressure = [];
+var humid = [];
+
+var temp1sum=0;
+var irsum=0;
+var fullsum=0;
+var vissum=0;
+var luxsum=0;
+var temp2sum=0;
+var pressuresum=0;
+var humidsum=0;
+var len=30;
+
+// define a new len if the dataset is less than 30
+if (results["sensor"].length < 30) {
+    len=results["sensor"].length;
+}
+// windowing averaging to smooth out plots
+for (var j=0;j<len;j++) {
+    temp1sum = temp1sum + results["sensor"][j].TEMP1;
+    irsum = irsum + results["sensor"][j].IR;
+    fullsum = fullsum + results["sensor"][j].FULL;
+    vissum = vissum + results["sensor"][j].VIS;
+    luxsum = luxsum + results["sensor"][j].LUX;
+    temp2sum = temp2sum + results["sensor"][j].TEMP2;
+    pressuresum = pressuresum + results["sensor"][j].PRESSURE;
+    humidsum = humidsum + results["sensor"][j].HUMID;
+}
+for (var i=0; i < results["sensor"].length-30; i++) {
+    var temp1current = results["sensor"][i].TEMP1;
+    var ircurrent = results["sensor"][i].IR;
+    var fullcurrent = results["sensor"][i].FULL;
+    var viscurrent = results["sensor"][i].VIS;
+    var luxcurrent = results["sensor"][i].LUX;
+    var temp2current = results["sensor"][i].TEMP2;
+    var pressurecurrent = results["sensor"][i].PRESSURE;
+    var humidcurrent = results["sensor"][i].HUMID;
+
+    results["sensor"][i].TEMP1 = temp1sum/30;
+    results["sensor"][i].IR = irsum/30;
+    results["sensor"][i].FULL = fullsum/30;
+    results["sensor"][i].VIS = vissum/30;
+    results["sensor"][i].LUX = luxsum/30;
+    results["sensor"][i].TEMP2 = temp2sum/30;
+    results["sensor"][i].PRESSURE = pressuresum/30;
+    results["sensor"][i].HUMID = humidsum/30;
+    
+	temp1sum = temp1sum - temp1current + results["sensor"][i+len].TEMP1;
+	irsum = irsum - ircurrent + results["sensor"][i+len].IR;
+	fullsum = fullsum - fullcurrent + results["sensor"][i+len].FULL;
+	vissum = vissum - viscurrent + results["sensor"][i+len].VIS;
+	luxsum = luxsum - luxcurrent + results["sensor"][i+len].LUX;
+	temp2sum = temp2sum - temp2current + results["sensor"][i+len].TEMP2;
+	pressuresum = pressuresum - pressurecurrent + results["sensor"][i+len].PRESSURE;
+	humidsum = humidsum - humidcurrent + results["sensor"][i+len].HUMID;
+}
+for (var i=results["sensor"].length-30; i<results["sensor"].length; i++) {
+    var temp1current = results["sensor"][i].TEMP1;
+    var ircurrent = results["sensor"][i].IR;
+    var fullcurrent = results["sensor"][i].FULL;
+    var viscurrent = results["sensor"][i].VIS;
+    var luxcurrent = results["sensor"][i].LUX;
+    var temp2current = results["sensor"][i].TEMP2;
+    var pressurecurrent = results["sensor"][i].PRESSURE;
+    var humidcurrent = results["sensor"][i].HUMID;
+    var len=results["sensor"].length-i;
+    
+	results["sensor"][i].TEMP1 = temp1sum/len;
+    results["sensor"][i].IR = irsum/len;
+    results["sensor"][i].FULL = fullsum/len;
+    results["sensor"][i].VIS = vissum/len;
+    results["sensor"][i].LUX = luxsum/len;
+    results["sensor"][i].TEMP2 = temp2sum/len;
+    results["sensor"][i].PRESSURE = pressuresum/len;
+    results["sensor"][i].HUMID = humidsum/len;
+    
+	temp1sum = temp1sum - temp1current;
+	irsum = irsum - ircurrent;
+	fullsum = fullsum - fullcurrent;
+	vissum = vissum - viscurrent;
+	luxsum = luxsum - luxcurrent;
+	temp2sum = temp2sum - temp2current; 
+	pressuresum = pressuresum - pressurecurrent;
+	humidsum = humidsum - humidcurrent;
+}
+
+// Converts units to more reasonable values and puts data points in created vars for JavaScript
+for (var i = 0; i < results["sensor"].length; i++) {
+	temp1.push(changeData((results["sensor"][i].TEMP1 * (9.0/5.0) + 32), results["sensor"][i].dt));
+	ir.push(changeData((results["sensor"][i].IR), results["sensor"][i].dt));
+	full.push(changeData((results["sensor"][i].FULL), results["sensor"][i].dt));
+	vis.push(changeData((results["sensor"][i].VIS), results["sensor"][i].dt));
+	lux.push(changeData((results["sensor"][i].LUX), results["sensor"][i].dt));
+	temp2.push(changeData(((results["sensor"][i].TEMP2/100.0) * (9.0/5.0) + 32), results["sensor"][i].dt));
+	pressure.push(changeData((results["sensor"][i].PRESSURE / 10000), results["sensor"][i].dt));
+	humid.push(changeData((results["sensor"][i].HUMID / 1000), results["sensor"][i].dt));
+}
+
+// Changes data into format that JavaScript can use (data and time points)
+function changeData(value, time) {
+	return {
+		t: time, 
+		y: value
+	};
+}
+
+////////// TEMPERATURE PLOT //////////
+var ctxtemp1 = document.getElementById("temp1").getContext('2d');
+Chart.defaults.global.defaultFontSize = 16;
+Chart.defaults.global.defaultFontColor = "#000000";
+var temp1 = new Chart(ctxtemp1, {
+    type: 'line',
+    data: {
+        datasets: [{
+			label: "High Res.",
+			lineTension: 0,
+			pointRadius: 0,
+			borderColor: "#FF1A00",
+			borderWidth: 2,
+			cubicInterpolationMode: "monotone",
+            data: temp1,
+			fill: false
+		}, {
+			label: "Basic",
+			lineTension: 0,
+			pointRadius: 0,
+			borderColor: "#FF9100",
+			borderWidth: 2,
+			cubicInterpolationMode: "monotone",
+            data: temp2,
+			fill: false
+		}],
+	 },
+
+    options: {
+		responsive: false,
+		responsiveAnimationDuration:0,
+		animation: {
+			duration: 0,
+		},
+		hover: {
+			animationDuration: 400,
+		},
+        scales: {
+			xAxes: [{
+				type: "time",
+				display: true,
+				scaleLabel: {
+					fontStyle: "bold",
+					display: true,
+					labelString: "Time",
+				},
+				gridLines: {
+					color: "rgba(0, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}],
+			yAxes: [{
+				display: true,
+				scaleLabel: {
+					display: true,
+					fontStyle: "bold",
+					labelString: "Temperature, Degrees F",
+				},
+				gridLines: {
+					zeroLineColor: "rgba(0, 0, 0, 255)",
+					zeroLineBorderDash: [4, 8],
+					color: "rgba(0, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}]
+		},
+		legend: {
+			display: true,
+			position: "top",
+			labels: {
+				boxWidth: 2,
+			},
+		},
+		title: {
+			display: true,
+			fontSize: 18, 
+			text: "Expansion Board High Resolution Temperature and Basic Temperature",
+		}
+    }
+});
+// Initially hide the plot
+hidePageElement('temp1');
+
+////////// LIGHT INTENSITY PLOT //////////
+var ctxir= document.getElementById("ir").getContext('2d');
+Chart.defaults.global.defaultFontSize = 16;
+Chart.defaults.global.defaultFontColor = "#000000";
+var ir = new Chart(ctxir, {
+    type: 'line',
+    data: {
+        datasets: [{
+			label: "Full",
+			lineTension: 0,
+			pointRadius: 0,
+			borderColor: "#00B023",
+			borderWidth: 2,
+			cubicInterpolationMode: "monotone",
+            data: full,
+			fill: false
+		},{	
+			label: "Infrared",
+			lineTension: 0,
+			pointRadius: 0,
+			borderColor: "#00A4B3",
+			borderWidth: 2,
+			cubicInterpolationMode: "monotone",
+            data: ir,
+			fill: false
+		},{
+			label: "Visible",
+			lineTension: 0,
+			pointRadius: 0,
+			borderColor: "#0059FF",
+			borderWidth: 2,
+			cubicInterpolationMode: "monotone",
+            data: vis,
+			fill: false
+		}],
+    },
+
+    options: {
+		responsive: false,
+		responsiveAnimationDuration:0,
+		animation: {
+			duration: 0,
+		},
+		hover: {
+			animationDuration: 400,
+		},
+        scales: {
+			xAxes: [{
+				type: "time",
+				display: true,
+				scaleLabel: {
+					display: true,
+					fontStyle: "bold",
+					labelString: "Time",
+				},
+				gridLines: {
+					color: "rgba(0, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}],
+			yAxes: [{
+				display: true,
+				scaleLabel: {
+					display: true,
+					fontStyle: "bold",
+					labelString: "Intensity, unsigned 16 bit raw value",
+				},
+				gridLines: {
+					zeroLineColor: "rgba(0, 0, 0, 255)",
+					zeroLineBorderDash: [4, 8],
+					color: "rgba(0, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}]
+		},
+		legend: {
+			display: true,
+			position: "top",
+			labels: {
+				boxWidth: 2,
+			},
+		},
+		title: {
+			display: true,
+			fontSize: 18, 
+			text: "Expansion Board Infrared, Visible Light, and Full Spectrum Intensity",
+		}
+    }
+});
+// Initially hide the plot
+hidePageElement('ir');
+
+////////// ILLUMINANCE PLOT //////////
+var ctxlux = document.getElementById("lux").getContext('2d');
+Chart.defaults.global.defaultFontSize = 16;
+Chart.defaults.global.defaultFontColor = "#000000";
+var lux = new Chart(ctxlux, {
+    type: 'line',
+    data: {
+        datasets: [{
+			label: "Lux",
+			lineTension: 0,
+			pointRadius: 0,
+			borderColor: "#AE00FF",
+			borderWidth: 2,
+			cubicInterpolationMode: "monotone",
+            data: lux,
+			fill: false
+        }],
+    },
+    options: {
+		responsive: false,
+		responsiveAnimationDuration:0,
+		animation: {
+			duration: 0,
+		},
+		hover: {
+			animationDuration: 400,
+		},
+        scales: {
+			xAxes: [{
+				type: "time",
+				display: true,
+				scaleLabel: {
+					display: true,
+					fontStyle: "bold",
+					labelString: "Time",
+				},
+				gridLines: {
+					color: "rgba(0, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}],
+			yAxes: [{
+				display: true,
+				scaleLabel: {
+					display: true,
+					fontStyle: "bold",
+					labelString: "Illuminance, Lux",
+				},
+				gridLines: {
+					zeroLineColor: "rgba(0, 0, 0, 255)",
+					zeroLineBorderDash: [4, 8],
+					color: "rgba(0, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}]
+		},
+		legend: {
+			display: false,
+			position: "top",
+			labels: {
+				boxWidth: 2,
+			},
+		},
+		title: {
+			display: true,
+			fontSize: 18, 
+			text: "Expansion Board Illuminance",
+		}
+    }
+});
+// Initially hide the plot
+hidePageElement('lux');
+
+////////// PRESSURE PLOT //////////
+var ctxpressure = document.getElementById("pressure").getContext('2d');
+Chart.defaults.global.defaultFontSize = 16;
+Chart.defaults.global.defaultFontColor = "#000000";
+var pressure = new Chart(ctxpressure, {
+    type: 'line',
+    data: {
+        datasets: [{
+			label: "Pressure",
+			lineTension: 0,
+			pointRadius: 0,
+			borderColor: "#FF00D5",
+			borderWidth: 2,
+			cubicInterpolationMode: "monotone",
+            data: pressure,
+			fill: false
+        }],
+    },
+    options: {
+		responsive: false,
+		responsiveAnimationDuration:0,
+		animation: {
+			duration: 0,
+		},
+		hover: {
+			animationDuration: 400,
+		},
+        scales: {
+			xAxes: [{
+				type: "time",
+				display: true,
+				scaleLabel: {
+					display: true,
+					fontStyle: "bold",
+					labelString: "Time",
+				},
+				gridLines: {
+					color: "rgba(0, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}],
+			yAxes: [{
+				display: true,
+				scaleLabel: {
+					display: true,
+					fontStyle: "bold",
+					labelString: "Pressure, millibars",
+				},
+				gridLines: {
+					zeroLineColor: "rgba(0, 0, 0, 255)",
+					zeroLineBorderDash: [4, 8],
+					color: "rgba(0, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}]
+		},
+		legend: {
+			display: false,
+			position: "top",
+			labels: {
+				boxWidth: 2,
+			},
+		},
+		title: {
+			display: true,
+			fontSize: 18, 
+			text: "Expansion Board Pressure",
+		}
+    }
+});
+// Initially hide the plot
+hidePageElement('pressure');
+
+////////// HUMIDITY PLOT //////////
+var ctxhumid = document.getElementById("humid").getContext('2d');
+Chart.defaults.global.defaultFontSize = 16;
+Chart.defaults.global.defaultFontColor = "#000000";
+var humid = new Chart(ctxhumid, {
+    type: 'line',
+    data: {
+        datasets: [{
+			label: "Humidity",
+			lineTension: 0,
+			pointRadius: 0,
+			borderColor: "#FF0051",
+			borderWidth: 2,
+			cubicInterpolationMode: "monotone",
+            data: humid,
+			fill: false
+        }],
+    },
+    options: {
+		responsive: false,
+		responsiveAnimationDuration:0,
+		animation: {
+			duration: 0,
+		},
+		hover: {
+			animationDuration: 400,
+		},
+        scales: {
+			xAxes: [{
+				type: "time",
+				display: true,
+				scaleLabel: {
+					display: true,
+					fontStyle: "bold",
+					labelString: "Time",
+				},
+				gridLines: {
+					color: "rgba(0, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}],
+			yAxes: [{
+				display: true,
+				scaleLabel: {
+					display: true,
+					fontStyle: "bold",
+					labelString: "Humidity, millipercent",
+				},
+				gridLines: {
+					zeroLineColor: "rgba(0, 0, 0, 255)",
+					zeroLineBorderDash: [4, 8],
+					color: "rgba(0, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}]
+		},
+		legend: {
+			display: false,
+			position: "top",
+			labels: {
+				boxWidth: 2,
+			},
+		},
+		title: {
+			display: true,
+			fontSize: 18, 
+			text: "Expansion Board Relative Humidity",
+		}
+    }
+});
+// Initially hide the plot
+hidePageElement('humid');
+
+}
+// Gets JSON data from PHP script
+var jsondata= $.ajax({url: 'sql24.php', dataType: 'json', }).done(function (results) { plot(results); } );
+</script>
+
+<script> 
+// Script making functions to toggle visibility of canvas/plots
+
+function showPageElement(what)  
+{  
+    var obj = typeof what == 'object'  
+        ? what : document.getElementById(what);  
+  
+    obj.style.display = 'block';  
+    return false;  
+}  
+  
+function hidePageElement(what)  
+{  
+    var obj = typeof what == 'object'  
+        ? what : document.getElementById(what);  
+  
+    obj.style.display = 'none';  
+    return false;  
+}  
+  
+function togglePageElementVisibility(what)  
+{  
+    var obj = typeof what == 'object'  
+        ? what : document.getElementById(what);  
+  
+    if (obj.style.display == 'none')  
+        obj.style.display = 'block';  
+    else  
+        obj.style.display = 'none';  
+    return false;  
+}
+</script>
+
+<script>
+// Script to fetch date and time
+var dt = new Date();
+document.getElementById("datetime").innerHTML = dt.toLocaleString();
+</script>
+
+<address>
+<p><a href="mailto:steele@muchemoresteele.com" style="color: #EB0000">steele@muchemoresteele.com</a></p>
+</address>
+</body>
+</html>

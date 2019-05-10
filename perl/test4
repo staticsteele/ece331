@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+#add all virtual size in perl
+my @x=`ps augx`;
+foreach (@x) {
+		next if (/^USER/);
+		@y=split(' ');
+		$process[$y[1]]=\@y;
+}
+print "@{$process[52]}\n";

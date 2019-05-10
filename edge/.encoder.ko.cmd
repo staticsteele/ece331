@@ -1,0 +1,1 @@
+cmd_/home/pi/ece331/edge/encoder.ko := ld -r  -EL -T ./scripts/module-common.lds -T ./arch/arm/kernel/module.lds  --build-id  -o /home/pi/ece331/edge/encoder.ko /home/pi/ece331/edge/encoder.o /home/pi/ece331/edge/encoder.mod.o ;  true

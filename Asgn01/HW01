@@ -1,0 +1,104 @@
+Steele Muchemore-Allen ECE 331 Homework #01
+
+
+1. Vim tutorial was completed. 
+
+2. The Linux Kernel Coding Style was reviewed and will be conformed to.
+
+3. 
+  a) 
+    /*
+	*Program will print all passed
+ 	*command line arguments. 
+ 	*/
+
+
+	#include <stdio.h>
+	#include <stdint.h>
+
+	int main(int argc, char *argv[])
+	{	
+
+			uint32_t count;
+			for(count=0; count<argc; count++)
+					printf("argv[%d]: %s\n",count,argv[count]);
+		
+			return 0;
+	}	
+
+  b) # ./args "it's The end 0f the world @s we know It.mp3" `ls *[[\]\&\-]*` 
+
+4.
+	/*
+	*Program that returns the length of single command line argument
+	* as string of a's. Returns error if # of args != 1 is passed
+	*/
+
+	#include <stdio.h>
+	#include <stdint.h>
+	#include <string.h> 
+
+	int main(int argc, char *argv[])
+	{
+			if(argc == 1) {
+					printf("Usage: %s count\n",argv[0]);
+					return 1;
+			}	
+			if(argc > 2) {
+					printf("Pass only one argument.\n");
+					return 1;
+			}	
+
+			uint32_t len;
+			len = strlen(argv[1]);
+			printf("%d\n",len);
+
+			return 0;
+	}
+
+5. The following code and command were used to determine longest single
+passable argument.
+
+	//Program that will print user specified # of a's
+
+	#include <stdio.h>
+	#include <stdint.h>
+	#include <stdlib.h> 
+
+
+
+	int main(int argc, char *argv[])
+	{
+			if(argc == 1) {
+					printf("Usage: %s count\n",argv[0]);
+					return 1;
+			}
+			if(argc > 2) {
+					printf("Pass only one argument.\n");
+					return 1;
+			}	
+
+			uint32_t len, c;
+			len = atoi(argv[1]);
+	
+			for(c = 0; c < len; c++)
+					printf("a");
+		
+			return 0;
+	}
+
+# ./strlen `./makestr 131072` returned an error while using 131071 did not.
+This means a string of 131071 characters is the longest single passable argument.
+
+6. 
+	a) The /usr directory is for all system-wide read-only files that the OS
+	installs. 
+	
+	b) The /bin directory contains all command binaries that are needed
+	for booting. We can expect to find our applications in there as a user. 
+
+7. SSH key was generated and added to ECE gitlab. 
+
+8. INSTALL file was followed and dfu-util was built from source. 
+
+9. Homework was printed with 'enscript'.

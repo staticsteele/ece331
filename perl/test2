@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+$fn="/etc/passwd";
+open( IN, "$fn") or die "cannot oopen $fn\n";
+$ofn=$fn;
+$ofn=~s-^.*/--;
+open( OUT, ">$ofn") or die "cannot oopen $fn\n";
+while (<IN>) {
+	chomp;
+	@x=split(/:/);
+	$s{$x[6]}++;
+}
+$,="\n";
+$\="\n";
+print keys(%s);
+$,="";
+$\="";
+foreach (keys(%s)) {
+		print "$s{$_} : $_\n";
+}

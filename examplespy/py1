@@ -1,0 +1,8 @@
+#!/usr/bin/python
+# This is crappy cat
+import sys
+lines=sys.stdin.readlines()
+print type(lines)
+print dir(lines[0])
+print help(lines)
+#print lines

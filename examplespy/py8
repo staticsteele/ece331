@@ -1,0 +1,6 @@
+#!/usr/bin/python                                                               
+# Better cat
+# Extra new line
+import fileinput
+for l in fileinput.input():
+	print l.rstrip()

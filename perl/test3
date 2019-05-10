@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+$\="\n";
+$,="\n";
+#print 1 .. 10; # range operator
+@x=(1 .. 10);
+#print @x;
+#print $#x . "\n"; # concatination
+
+$x[100]=42;
+
+&def(\@x);	# calling function \ pointer
+
+sub def {
+		# @_ are the args
+	if (@{$_[0]}) { # @{} dereference pointer
+			print "defined\n";
+	} else {
+			print "Undefined\n";
+	}
+}

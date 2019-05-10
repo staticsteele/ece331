@@ -1,0 +1,23 @@
+
+1) This homework was written in vim.
+
+2, 3, 4) For a web server, nginx was set up with MySQL and PHP.
+
+# sudo apt-get install nginx
+# sudo apt-get install mysql-server
+# sudo mysql_secure_installation
+# sudo apt-get install php7.0-fpm php7.0-mysql
+# sudo vim /etc/nginx/sites-available/default
+	- Added public IP as server_name
+	- Allowed PHP scripts to be run with server
+# sudo nginx -t
+# sudo systemctl reload nginx
+	- Added port forwarding to access web server
+# cd /var/www/html/
+# sudo mv index.nginx-debian.html index.php
+	- Added <?php echo phpinfo(); ?> to index.php to test 
+
+5)  5 11 */2 * * /path/to/xkcd
+   55 23 */2 * * /path/to/xkcd
+
+6) This homework was printed with 'enscript'.

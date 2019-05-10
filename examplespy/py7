@@ -1,0 +1,19 @@
+#!/usr/bin/python                                                               
+# Better cat
+# Extra new line
+import sys                                                                      
+
+if (len(sys.argv[1:])):
+	for f in sys.argv[1:]:
+		try:
+			fh=open(f,'r')
+		except:
+			print "Cannot open "+f
+			continue
+		for l in fh.readlines():
+			print l,
+else:
+	for l in sys.stdin.readlines():
+		print l,
+
+

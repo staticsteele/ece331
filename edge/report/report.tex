@@ -1,0 +1,56 @@
+\documentclass[12pt]{article}
+\usepackage[letterpaper, portrait, left=1in, right=0.5in, top=1in, bottom=0.75in]{geometry}
+\usepackage{times}
+\usepackage{ragged2e}
+\usepackage{sectsty}
+\usepackage{setspace}
+\sectionfont{\fontsize{12}{15}\selectfont}
+\hyphenpenalty=500
+%\linespread{2.0}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+
+ \rfoot{\thepage}
+ \renewcommand{\headrulewidth}{0pt}
+
+ \title{Kernel Edge Report}
+ \author{Steele Muchemore-Allen}
+ \date{April 18, 2018}
+
+ \begin{document}
+
+ \begin{center}
+         
+    \textbf{\large{Steele Muchemore-Allen}}\\
+    \textbf{\large{April 18, 2019}}\\
+    \textbf{\large{ECE 331}}\\
+ \end{center}
+
+ \section*{Introduction}
+ \begin{FlushLeft}
+ 	\begin{spacing}{2}
+     It is necessary to manage which process can use system resources at a given time in a mutli-core system. In the edge kernel module, this was achieved by encorporating mutex locks. The mutex lock is a simple way to lock the system resources to one process until the process is complete and releases the lock.
+     \end{spacing}
+ \end{FlushLeft}
+ \section*{Locking:  Purpose, Design, and Testing}
+
+ \begin{FlushLeft}
+ 	\begin{spacing}{2}
+     Without proper locking, a process could interfere with another process, possibly causing data corruption or loss. In the edge kernel module, the mutex lock was selected for locking purposes. \vspace{12pt}
+     
+     Designing the kernel module with mutex locks was done with the functions in linux/mutex.h. Locks were initialized, tested, aquired, and relaesed using mutex function calls.\vspace{12pt}
+     
+     Testing the mutex lock was done using a C program which called fork() to create child processes. The processes attempted to write to the edge device, each waiting util the resources were unlocked by the current process. Testing the locking ensured that edge was a concurrent multi-threaded kernel module.
+	\end{spacing}
+ \end{FlushLeft}
+
+ \section*{Conclusion}
+
+ \begin{FlushLeft}
+ 	\begin{spacing}{2}
+	Mutex locking was the selected method of locking for the kernel module due to its ease of initializing, checking, and getting locks. The design of the kernel module used mutex funtions defined in linex/mutex.h. Testing the mutex lock was done with a C program that created parent and child processes to test the effectiveness and correctness of locking in the kernel. 
+	\end{spacing}
+ \end{FlushLeft}
+
+ \end{document}

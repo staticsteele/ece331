@@ -1,0 +1,93 @@
+
+1. This homework was written in vim. 
+
+2. Encoder program was committed and pushed to gitlab. 
+
+3. Decoder program was committed and pushed to gitlab.
+
+4.
+  a) The minimum match is any letter, then any char,ending with a 0.
+
+  b) The minimum match is any and only 1 single character.
+
+  c) The minimum match is any single digit.
+
+  d) The minimum match is nothing.
+
+5.
+  a) '(((0b)?[01]+)|([01]+B?))'
+ 
+  b) This takes in to account any preceding "0b" or ending "B".
+     The minimum match would be a single 1 or 0. 
+
+6.
+  a) '-?([0-9]*[02468],)*[0-9]*[02468]'
+
+  b) The minimum match would be a single digit even number.
+
+7.
+  a) '-?([0-9]+(\.[0-9]*)?|(\.[0-9]+))'
+
+  b) The minimum match would be a single digit, which can be
+     used as a floating point number in C.
+
+8. 
+
+#!/usr/bin/python
+
+#Script fetches webpage and writes it to file
+
+import urllib, sys
+
+#checks command line arguements
+if len(sys.argv) != 2
+    sys.exit("Usage: "+sys.argv[0]+" url")
+
+#Retrieves webpage and writes it to test.txt
+urllib.urlretrieve(sys.argv[1],"test.txt")
+
+9. 
+
+#!/usr/bin/python
+
+#Script finds word lengths in dictionary and plots their frequencies
+
+from collections import Counter
+import numpy as np
+import matplotlib
+matplotlib.use('GTKAgg') #Enables the correct backend to display figure
+import matplotlib.pyplot as plt
+
+lengths = []
+
+#Reads lines in from words file and strips newlines
+with open("/usr/share/dict/words") as f:
+    content = f.readlines()
+    content = [x.strip() for x in content]
+
+#creates list of lengths of words above
+for n in content:
+    lengths.append(len(n))
+
+#Finds one of the words with max length in lines retrieved
+long = max(content, key=len)
+print ("A word with the longest number of letters is "+long+".")
+
+#Counter finds frequency of values in given list
+labels, values = zip(*Counter(lengths).items())
+
+#Makes in-order indexes based on home many word lengths we have
+indexes = np.arange(len(labels))
+
+width = 1
+
+#Formats and plots histogram
+plt.bar(indexes, values, width)
+plt.xticks(indexes + width * 0.5, labels)
+plt.ylabel('Number of words')
+plt.xlabel('Length of words')
+plt.title('Histogram of lengths of words in /usr/share/dict/words')
+plt.show()
+
+10. This homework was printed with 'enscript'.
+
